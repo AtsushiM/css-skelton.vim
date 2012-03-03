@@ -4,3 +4,12 @@ htmlタグ上で
 
 タグ名、class、idのセレクタのスケルトンをヤンクします。
 ペーストコマンドで好きな場所に貼り付けてください。
+
+以下のグローバル変数を書き換えることで動作を変更できます。
+
+" 出力しないタグ
+let g:cssskelton_ignoretags = ['html', 'head', 'title', 'meta', 'link', 'style', 'body', 'script', 'noscript', 'br', 'img']
+
+" 出力するパターン＆順序
+let g:cssskelton_outputselecter = ['tag', 'class', 'id']
+
