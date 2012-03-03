@@ -3,6 +3,9 @@
 "VERSION:  0.9
 "LICENSE:  MIT
 
+let g:cssskelton_ignoretags = ['script', 'noscript','br', 'img']
+let g:cssskelton_outputselecter = ['tag', 'id', 'class']
+
 function! s:CssSkelton()
     let block_end = 0
     let tag_count = 0
@@ -19,45 +22,52 @@ function! s:CssSkelton()
 
             if tags != []
                 let tag_name = tags[3]
+                let chk = matchlist(tag_name, '\v(^!--.*)')
 
-                let closechk = matchlist(tag_name, '\v(^/.*|.*/$)')
-                if closechk == []
-                    let tag_count = tag_count + 1
-                    let tag_val = matchlist(tag_name, '\v(.{-})\s+(.*)')
-                    let tag_props = ''
+                if chk == []
+                    let chk = matchlist(tag_name, '\v(^/.*)')
+                    if chk == []
+                        let chk = matchlist(tag_name, '\v(.*/$)')
+                        if chk == []
+                            let tag_count = tag_count + 1
+                        endif
 
-                    if tag_val != []
-                        let tag_name = tag_val[1]
-                        let tag_props = tag_val[2]
-                        let tag_prop_end = 0
+                        let tag_val = matchlist(tag_name, '\v(.{-})\s+(.*)')
+                        let tag_props = ''
 
-                        while tag_prop_end != 1
-                            let tag_prop = matchlist(tag_props, '\v.{-}(class|id)\="(.{-})"(.*)')
-                            if tag_prop != []
-                                let dict = tag_dict[tag_prop[1]]
+                        if tag_val != []
+                            let tag_name = tag_val[1]
+                            let tag_props = tag_val[2]
+                            let tag_prop_end = 0
 
-                                for e in split(tag_prop[2], '\s')
-                                    if count(dict, e) == 0
-                                        let dict = add(dict, e)
-                                    endif
-                                endfor
+                            while tag_prop_end != 1
+                                let tag_prop = matchlist(tag_props, '\v.{-}(class|id)\="(.{-})"(.*)')
+                                if tag_prop != []
+                                    let dict = tag_dict[tag_prop[1]]
 
-                                let tag_props = tag_prop[3]
-                            else
-                                let tag_prop_end = 1
-                            endif
-                        endwhile
-                    endif
+                                    for e in split(tag_prop[2], '\s')
+                                        if count(dict, e) == 0
+                                            let dict = add(dict, e)
+                                        endif
+                                    endfor
 
-                    let dict = tag_dict['tag']
-                    if count(dict, tag_name) == 0
-                        let dict = add(dict, tag_name)
-                    endif
-                else
-                    let tag_count = tag_count - 1
+                                    let tag_props = tag_prop[3]
+                                else
+                                    let tag_prop_end = 1
+                                endif
+                            endwhile
+                        endif
 
-                    if tag_count <= 0
-                        let block_end = 1
+                        let dict = tag_dict['tag']
+                        if count(g:cssskelton_ignoretags, tag_name) == 0 && count(dict, tag_name) == 0
+                            let dict = add(dict, tag_name)
+                        endif
+                    else
+                        let tag_count = tag_count - 1
+
+                        if tag_count <= 0
+                            let block_end = 1
+                        endif
                     endif
                 endif
 
@@ -71,16 +81,25 @@ function! s:CssSkelton()
 
     " echo skelton
     let ret = ''
-    for e in tag_dict['tag']
-        let ret = ret.e." {}\n"
-    endfor
-    for e in tag_dict['id']
-        let ret = ret.'#'.e." {}\n"
-    endfor
-    for e in tag_dict['class']
-        let ret = ret.'.'.e." {}\n"
-    endfor
-    let @@ = ret
+    if count(g:cssskelton_outputselecter, 'tag')
+        for e in tag_dict['tag']
+            let ret = ret.e." {}\n"
+        endfor
+    endif
+    if count(g:cssskelton_outputselecter, 'id')
+        for e in tag_dict['id']
+            let ret = ret.'#'.e." {}\n"
+        endfor
+    endif
+    if count(g:cssskelton_outputselecter, 'class')
+        for e in tag_dict['class']
+            let ret = ret.'.'.e." {}\n"
+        endfor
+    endif
+
+    if ret != ''
+        let @@ = ret
+    endif
 endfunction
 
 command! CssSkelton call s:CssSkelton()
