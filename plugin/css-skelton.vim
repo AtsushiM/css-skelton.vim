@@ -3,14 +3,15 @@
 "VERSION:  0.9
 "LICENSE:  MIT
 
-let g:cssskelton_ignoretags = ['script', 'noscript','br', 'img']
-let g:cssskelton_outputselecter = ['tag', 'id', 'class']
+let g:cssskelton_ignoretags = ['html', 'head', 'title', 'meta', 'link', 'style', 'body', 'script', 'noscript', 'br', 'img']
+let g:cssskelton_outputselecter = ['tag', 'class', 'id']
 
 function! s:CssSkelton()
     let block_end = 0
     let tag_count = 0
     let tag_dict = {'tag':[], 'id':[], 'class':[]}
     let line_no = line('.')
+    let sign = {'tag':'', 'id':'#', 'class':'.'}
 
     while block_end != 1
         let line = getline(line_no)
@@ -22,7 +23,7 @@ function! s:CssSkelton()
 
             if tags != []
                 let tag_name = tags[3]
-                let chk = matchlist(tag_name, '\v(^!--.*)')
+                let chk = matchlist(tag_name, '\v(^!.*)')
 
                 if chk == []
                     let chk = matchlist(tag_name, '\v(^/.*)')
@@ -81,21 +82,12 @@ function! s:CssSkelton()
 
     " echo skelton
     let ret = ''
-    if count(g:cssskelton_outputselecter, 'tag')
-        for e in tag_dict['tag']
-            let ret = ret.e." {}\n"
+
+    for e in g:cssskelton_outputselecter
+        for i in tag_dict[e]
+            let ret = ret.sign[e].i." {}\n"
         endfor
-    endif
-    if count(g:cssskelton_outputselecter, 'id')
-        for e in tag_dict['id']
-            let ret = ret.'#'.e." {}\n"
-        endfor
-    endif
-    if count(g:cssskelton_outputselecter, 'class')
-        for e in tag_dict['class']
-            let ret = ret.'.'.e." {}\n"
-        endfor
-    endif
+    endfor
 
     if ret != ''
         let @@ = ret
