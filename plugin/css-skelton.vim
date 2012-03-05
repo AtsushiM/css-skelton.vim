@@ -3,14 +3,22 @@
 "VERSION:  0.9
 "LICENSE:  MIT
 
-let g:cssskelton_ignoretags = ['html', 'head', 'title', 'meta', 'link', 'style', 'body', 'script', 'noscript', 'br', 'img']
-let g:cssskelton_outputselecter = ['tag', 'class', 'id']
+if !exists('g:cssskelton_ignoretags')
+    let g:cssskelton_ignoretags = ['html', 'head', 'title', 'meta', 'link', 'style', 'body', 'script', 'noscript', 'object', 'br', 'img',  'hr', 'meta', 'input', 'embed', 'area', 'base', 'col', 'keygen', 'link', 'param', 'source']
+endif
+if !exists('g:cssskelton_outputselecter')
+    let g:cssskelton_outputselecter = ['tag', 'class', 'id']
+endif
+if !exists('g:cssskeltion_ignoreclose')
+    let g:cssskeltion_ignoreclose = ['br', 'img', 'hr', 'meta', 'input', 'embed', 'area', 'base', 'col', 'keygen', 'link', 'param', 'source']
+endif
 
 function! s:CssSkelton()
     let block_end = 0
     let tag_count = 0
     let tag_dict = {'tag':[], 'id':[], 'class':[]}
     let line_no = line('.')
+    let page_end = line('w$')
     let sign = {'tag':'', 'id':'#', 'class':'.'}
 
     while block_end != 1
@@ -28,7 +36,12 @@ function! s:CssSkelton()
                 if chk == []
                     let chk = matchlist(tag_name, '\v(^/.*)')
                     if chk == []
-                        let chk = matchlist(tag_name, '\v(.*/$)')
+                        let chkt = ''
+                        for e in g:cssskeltion_ignoreclose
+                            let chkt = chkt.' .*|'
+                        endfor
+                        let chkt = '\v('.chkt.'.*/$)'
+                        let chk = matchlist(tag_name, chkt)
                         if chk == []
                             let tag_count = tag_count + 1
                         endif
@@ -66,6 +79,11 @@ function! s:CssSkelton()
                     else
                         let tag_count = tag_count - 1
 
+                        if tag_name == '/body'
+                            let tag_count = 0
+                        endif
+                        echo tag_count
+
                         if tag_count <= 0
                             let block_end = 1
                         endif
@@ -76,21 +94,27 @@ function! s:CssSkelton()
             else
                 let line_end = 1
                 let line_no = line_no + 1
+
+                if line_no > page_end
+                    let block_end = 1
+                endif
             endif
         endwhile
     endwhile
 
-    " echo skelton
     let ret = ''
 
     for e in g:cssskelton_outputselecter
         for i in tag_dict[e]
-            let ret = ret.sign[e].i." {}\n"
+            let ret = ret.sign[e].i." {\n}\n"
         endfor
     endfor
 
     if ret != ''
         let @@ = ret
+        echo 'Yanked CSS Skelton.'
+    else
+        echo 'No Yanked.'
     endif
 endfunction
 
