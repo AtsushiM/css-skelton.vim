@@ -4,7 +4,7 @@
 "LICENSE:  MIT
 
 if !exists('g:cssskelton_ignoretags')
-    let g:cssskelton_ignoretags = ['html', 'head', 'title', 'meta', 'link', 'style', 'body', 'script', 'noscript', 'object', 'br', 'img',  'hr', 'meta', 'input', 'embed', 'area', 'base', 'col', 'keygen', 'link', 'param', 'source']
+    let g:cssskelton_ignoretags = ['head', 'title', 'meta', 'link', 'style', 'script', 'noscript', 'object', 'br', 'img',  'hr', 'embed', 'area', 'base', 'col', 'keygen', 'param', 'source']
 endif
 if !exists('g:cssskelton_outputselecter')
     let g:cssskelton_outputselecter = ['tag', 'class', 'id']
@@ -14,15 +14,12 @@ function! s:CssSkelton()
     let block_end = 0
     let tag_count = 0
     let tag_nests = []
-    let tag_dict = {'tag':[], 'id':[], 'class':[]}
     let line_no = line('.')
     let page_end = line('w$')
-    let sign = {'tag':'', 'id':'#', 'class':'.'}
 
     while block_end != 1
         let line = getline(line_no)
         let line_end = 0
-        " let block_end = 1
 
         while line_end != 1
             let tags = matchlist(line, '\v(.{-})(\<)(.{-})(\>)(.*)')
@@ -59,13 +56,8 @@ function! s:CssSkelton()
                             while tag_prop_end != 1
                                 let tag_prop = matchlist(tag_props, '\v.{-}(class|id)\="(.{-})"(.*)')
                                 if tag_prop != []
-                                    let dict = tag_dict[tag_prop[1]]
-
                                     for e in split(tag_prop[2], '\s')
                                         let tag_nest[tag_prop[1]] = e
-                                        if count(dict, e) == 0
-                                            let dict = add(dict, e)
-                                        endif
                                     endfor
 
                                     let tag_props = tag_prop[3]
@@ -74,11 +66,6 @@ function! s:CssSkelton()
                                 endif
                             endwhile
 
-                        endif
-
-                        let dict = tag_dict['tag']
-                        if count(g:cssskelton_ignoretags, tag_name) == 0 && count(dict, tag_name) == 0
-                            let dict = add(dict, tag_name)
                         endif
 
                         let tag_nests = add(tag_nests, tag_nest)
@@ -141,7 +128,11 @@ function! s:CssSkelton()
             let mindent = mindent.indent
             let i = i + 1
         endwhile
-        let full = full.mindent.s:getSelecterPhrase(obj)." {\n"
+
+        let phrase = s:getSelecterPhrase(obj)
+        if phrase != ''
+            let full = full.mindent.phrase." {\n"
+        endif
         let layer = obj.layer
     endfor
 
@@ -172,8 +163,11 @@ function! s:getSelecterPhrase(obj)
     let class = a:obj.class
     let id = a:obj.id
 
+    if count(g:cssskelton_ignoretags, tag) != 0
+        let tag = ''
+    endif
+
     if class == '' && id == ''
-        return tag
     else
         let tag = ''
         if class != ''
@@ -182,9 +176,9 @@ function! s:getSelecterPhrase(obj)
         if id != ''
             let tag = tag.'#'.id
         endif
-
-        return tag
     endif
+
+    return tag
 endfunction
 
 command! CssSkelton call s:CssSkelton()
