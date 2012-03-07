@@ -14,6 +14,8 @@ function! s:CssSkelton()
     let block_end = 0
     let tag_count = 0
     let tag_nests = []
+    let tag_uniqe = []
+    let fullpath = ''
     let line_no = line('.')
     let page_end = line('w$')
 
@@ -68,10 +70,20 @@ function! s:CssSkelton()
 
                         endif
 
-                        let tag_nests = add(tag_nests, tag_nest)
 
+                        let fullpath = fullpath.'/'.(tag_nest.tag).'.'.(tag_nest.class).'#'.(tag_nest.id)
+                        if count(tag_uniqe, fullpath) == 0
+                            let tag_uniqe = add(tag_uniqe, fullpath)
+                            let tag_nest.path = fullpath
+                        else
+                        endif
+
+                        let tag_nests = add(tag_nests, tag_nest)
                     else
                         let tag_count = tag_count - 1
+                        let fullpathary = split(fullpath, '/')
+                        unlet fullpathary[-1]
+                        let fullpath = join(fullpathary, '/')
 
                         if tag_name == '/body'
                             let tag_count = 0
