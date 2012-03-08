@@ -37,10 +37,6 @@ function! s:CssSkelton()
                     let chk = matchlist(tag_name, '\v(^/.*)')
                     if chk == []
                         let chk = matchlist(tag_name, '\v(.*/$)')
-                        if chk != []
-                            let tags[5] = '</dammyskelton>'.tags[5]
-                        endif
-                        let tag_count = tag_count + 1
 
                         let tag_val = matchlist(tag_name, '\v(.{-})\s+(.*)')
                         let tag_props = ''
@@ -49,7 +45,6 @@ function! s:CssSkelton()
                         let tag_nest.tag = tag_name
                         let tag_nest.id = ''
                         let tag_nest.class = ''
-                        let tag_nest.layer = tag_count
 
                         if tag_val != []
                             let tag_name = tag_val[1]
@@ -73,59 +68,70 @@ function! s:CssSkelton()
 
                         endif
 
+                        if count(g:cssskelton_ignoretags, tag_name) == 0
+                            let tag_count = tag_count + 1
+                            let tag_nest.layer = tag_count
 
-                        let fullpath = fullpath.' '.(tag_nest.layer).'-'.(tag_nest.tag).'.'.(tag_nest.class).'#'.(tag_nest.id)
-                        let tag_nest.path = fullpath
-
-                        if count(tag_uniqe, fullpath) == 0
-                            let tag_uniqe = add(tag_uniqe, fullpath)
-
-                            let fullpathary = split(fullpath, ' ')
-                            let nowpath = fullpathary[-1]
-                            unlet fullpathary[-1]
-                            let beforepath = join(fullpathary, ' ')
-                            if [] == matchlist(beforepath, '\v^/(.*)')
-                                let beforepath = ' '.beforepath
+                            if chk != []
+                                let tags[5] = '</'.tag_name.'>'.tags[5]
                             endif
 
-                            if count(tag_uniqe, beforepath) == 0
-                                let tag_nests = add(tag_nests, tag_nest)
-                            else
-                                " TODO insert()
-                                let i = 0
-                                let dlayer = -1 
-                                while i < len(tag_nests)
-                                    if dlayer == -1
-                                        if tag_nests[i].path == beforepath
-                                            let dlayer = tag_nests[i].layer + 1
-                                        endif
-                                    elseif dlayer > tag_nests[i].layer
-                                        let tag_nests = insert(tag_nests, tag_nest, i)
-                                        break
-                                    endif
-                                    let i = i + 1
-                                endwhile
+                            let fullpath = fullpath.' '.(tag_nest.layer).'-'.(tag_nest.tag).'.'.(tag_nest.class).'#'.(tag_nest.id)
+                            let tag_nest.path = fullpath
 
-                                if i == len(tag_nests)
+                            if count(tag_uniqe, fullpath) == 0
+                                let tag_uniqe = add(tag_uniqe, fullpath)
+
+                                let fullpathary = split(fullpath, ' ')
+                                let nowpath = fullpathary[-1]
+                                unlet fullpathary[-1]
+                                let beforepath = join(fullpathary, ' ')
+                                if [] == matchlist(beforepath, '\v^/(.*)')
+                                    let beforepath = ' '.beforepath
+                                endif
+
+                                if count(tag_uniqe, beforepath) == 0
                                     let tag_nests = add(tag_nests, tag_nest)
+                                else
+                                    " TODO insert()
+                                    let i = 0
+                                    let dlayer = -1 
+                                    while i < len(tag_nests)
+                                        if dlayer == -1
+                                            if tag_nests[i].path == beforepath
+                                                let dlayer = tag_nests[i].layer + 1
+                                            endif
+                                        elseif dlayer > tag_nests[i].layer
+                                            let tag_nests = insert(tag_nests, tag_nest, i)
+                                            break
+                                        endif
+                                        let i = i + 1
+                                    endwhile
+
+                                    if i == len(tag_nests)
+                                        let tag_nests = add(tag_nests, tag_nest)
+                                    endif
                                 endif
                             endif
                         endif
                     else
-                        let tag_count = tag_count - 1
-                        let fullpathary = split(fullpath, ' ')
-                        unlet fullpathary[-1]
-                        let fullpath = join(fullpathary, ' ')
-                        if [] == matchlist(fullpath, '\v^/(.*)')
-                            let fullpath = ' '.fullpath
-                        endif
+                        let tag_name = matchlist(tag_name, '\v^/(.+)')[1]
+                        if count(g:cssskelton_ignoretags, tag_name) == 0
+                            let tag_count = tag_count - 1
+                            let fullpathary = split(fullpath, ' ')
+                            unlet fullpathary[-1]
+                            let fullpath = join(fullpathary, ' ')
+                            if [] == matchlist(fullpath, '\v^/(.*)')
+                                let fullpath = ' '.fullpath
+                            endif
 
-                        if tag_name == '/body'
-                            let tag_count = 0
-                        endif
+                            if tag_name == 'body'
+                                let tag_count = 0
+                            endif
 
-                        if tag_count <= 0
-                            let block_end = 1
+                            if tag_count <= 0
+                                let block_end = 1
+                            endif
                         endif
                     endif
                 endif
@@ -210,13 +216,7 @@ function! s:getSelecterPhrase(obj)
     let class = a:obj.class
     let id = a:obj.id
 
-    if count(g:cssskelton_ignoretags, tag) != 0
-        let tag = ''
-    endif
-
-    if class == '' && id == ''
-        let tag = a:obj.tag
-    else
+    if class.id != ''
         let tag = ''
         if class != ''
             let tag = tag.'.'.class
