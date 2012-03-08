@@ -9,9 +9,6 @@ endif
 if !exists('g:cssskelton_ignoretags')
     let g:cssskelton_ignoretags = ['head', 'title', 'meta', 'link', 'style', 'script', 'noscript', 'object', 'br', 'hr', 'embed', 'area', 'base', 'col', 'keygen', 'param', 'source']
 endif
-if !exists('g:cssskelton_outputselecter')
-    let g:cssskelton_outputselecter = ['tag', 'class', 'id']
-endif
 
 function! s:CssSkelton()
     let block_end = 0

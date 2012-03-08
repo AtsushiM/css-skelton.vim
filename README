@@ -1,7 +1,6 @@
 htmlタグ上で
 :CssSkelton
-を実行すれば
-
+を実行すれば 開始行のタグを起点にsass形式の
 タグ名、class、idのセレクタのスケルトンをヤンクします。
 ペーストコマンドで好きな場所に貼り付けてください。
 
@@ -10,6 +9,5 @@ htmlタグ上で
 " 出力しないタグ
 let g:cssskelton_ignoretags = ['html', 'head', 'title', 'meta', 'link', 'style', 'body', 'script', 'noscript', 'br', 'img']
 
-" 出力するパターン＆順序
-let g:cssskelton_outputselecter = ['tag', 'class', 'id']
-
+" インデント
+let g:cssskelton_indent = "    "
