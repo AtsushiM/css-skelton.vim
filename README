@@ -7,7 +7,7 @@ htmlタグ上で
 以下のグローバル変数を書き換えることで動作を変更できます。
 
 " 出力しないタグ
-let g:cssskelton_ignoretags = ['html', 'head', 'title', 'meta', 'link', 'style', 'body', 'script', 'noscript', 'br', 'img']
+let g:cssskelton_ignoretags = ['head', 'title', 'meta', 'link', 'style', 'script', 'noscript', 'object', 'br', 'hr', 'embed', 'area', 'base', 'col', 'keygen', 'param', 'source']
 
 " インデント
 let g:cssskelton_indent = "    "
