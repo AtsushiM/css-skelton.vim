@@ -226,4 +226,4 @@ function! s:getSelecterPhrase(obj)
     return tag
 endfunction
 
-command! CssSkelton call s:CssSkelton()
+command! SassSkelton call s:SassSkelton()
