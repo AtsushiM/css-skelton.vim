@@ -10,7 +10,7 @@ if !exists('g:cssskelton_ignoretags')
     let g:cssskelton_ignoretags = ['head', 'title', 'meta', 'link', 'style', 'script', 'noscript', 'object', 'br', 'hr', 'embed', 'area', 'base', 'col', 'keygen', 'param', 'source']
 endif
 
-function! s:CssSkelton()
+function! s:SassSkelton()
     let block_end = 0
     let tag_count = 0
     let tag_nests = []
