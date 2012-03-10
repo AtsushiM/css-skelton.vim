@@ -1,8 +1,12 @@
 "AUTHOR:   Atsushi Mizoue <asionfb@gmail.com>
-"WEBSITE:  https://github.com/AtsushiM/sass-skelton
+"WEBSITE:  https://github.com/AtsushiM/css-skelton.vim
 "VERSION:  0.9
 "LICENSE:  MIT
 
+if !exists('g:cssskelton_type')
+    let g:cssskelton_type = "css"
+    " let g:cssskelton_type = "sass"
+endif
 if !exists('g:cssskelton_indent')
     let g:cssskelton_indent = "    "
 endif
@@ -10,7 +14,7 @@ if !exists('g:cssskelton_ignoretags')
     let g:cssskelton_ignoretags = ['head', 'title', 'meta', 'link', 'style', 'script', 'noscript', 'object', 'br', 'hr', 'embed', 'area', 'base', 'col', 'keygen', 'param', 'source']
 endif
 
-function! s:SassSkelton()
+function! s:CssSkelton()
     let block_end = 0
     let tag_count = 0
     let tag_nests = []
@@ -156,58 +160,86 @@ function! s:SassSkelton()
 
     let ret = ''
 
-    let full = ''
-    let indent = g:cssskelton_indent
-    let mindent = ''
-    let bindent = mindent
-    let layer = 0
-    for obj in tag_nests
-        let i = 1
+    if g:cssskelton_type == 'sass'
+        let full = ''
+        let indent = g:cssskelton_indent
+        let mindent = ''
         let bindent = mindent
-        if obj.layer <= layer
-            let l = layer - obj.layer
-            if l == 0
-                let full = full.bindent."}\n"
-            else
-                while l + 1 > 0
-                    let layer = layer - 1
-                    let cl = layer
-                    let mindent = ''
-                    while cl > 0
-                        let mindent = mindent.indent
-                        let cl = cl - 1
+        let layer = 0
+        for obj in tag_nests
+            let i = 1
+            let bindent = mindent
+            if obj.layer <= layer
+                let l = layer - obj.layer
+                if l == 0
+                    let full = full.bindent."}\n"
+                else
+                    while l + 1 > 0
+                        let layer = layer - 1
+                        let cl = layer
+                        let mindent = ''
+                        while cl > 0
+                            let mindent = mindent.indent
+                            let cl = cl - 1
+                        endwhile
+                        let full = full.mindent."}\n"
+                        let l = l - 1
                     endwhile
-                    let full = full.mindent."}\n"
-                    let l = l - 1
-                endwhile
+                endif
             endif
-        endif
-        let mindent = ''
-        while i < obj.layer
-            let mindent = mindent.indent
-            let i = i + 1
+            let mindent = ''
+            while i < obj.layer
+                let mindent = mindent.indent
+                let i = i + 1
+            endwhile
+
+            let phrase = s:getSelecterPhrase(obj)
+            if phrase != ''
+                let full = full.mindent.phrase." {\n"
+            endif
+            let layer = obj.layer
+        endfor
+
+        let i = layer
+        while i > 0
+            let j = 1
+            let mindent = ''
+            while j < i
+                let mindent = mindent.indent
+                let j = j + 1
+            endwhile
+            let full = full.mindent."}\n"
+            let i = i - 1
         endwhile
+        let ret = full
+    else
+        for obj in tag_nests
+            let end = 0
+            let path = ''
+            let base = obj.path
+            while end == 0
+                let paths = matchlist(base, '\v^( [0-9]+\-)([^ ]+)(.*)')
+                
+                if paths != []
+                    let phrases = matchlist(paths[2], '\v(.{-})\.(.{-})#(.*)')
 
-        let phrase = s:getSelecterPhrase(obj)
-        if phrase != ''
-            let full = full.mindent.phrase." {\n"
-        endif
-        let layer = obj.layer
-    endfor
+                    if phrases[3] != ''
+                        let path = path.'#'.phrases[3]
+                    elseif phrases[2] != ''
+                        let path = path.'.'.phrases[2]
+                    else
+                        let path = path.phrases[1]
+                    endif
 
-    let i = layer
-    while i > 0
-        let j = 1
-        let mindent = ''
-        while j < i
-            let mindent = mindent.indent
-            let j = j + 1
-        endwhile
-        let full = full.mindent."}\n"
-        let i = i - 1
-    endwhile
-
-    let ret = full
+                    let path = path.' '
+                    let base = paths[3]
+                else
+                    let end = 1
+                endif
+            endwhile
+            let ret = ret.path."{\n}\n"
+        endfor
+    endif
 
     if ret != ''
         let @@ = ret
@@ -216,36 +248,36 @@ function! s:SassSkelton()
         echo 'No Yanked.'
     endif
 
-    unlet beforepath
-    unlet bindent
-    unlet block_end
-    unlet chk
-    unlet full
-    unlet fullpath
-    unlet fullpath_rec
-    unlet fullpathary
-    unlet i
-    unlet indent
-    unlet layer
-    unlet line
-    unlet line_end
-    unlet line_no
-    unlet mindent
-    unlet nowpath
-    unlet page_end
-    unlet phrase
-    unlet ret
-    unlet tag_count
-    unlet tag_name
-    unlet tag_nest
-    unlet tag_nest_ary
-    unlet tag_nests
-    unlet tag_prop
-    unlet tag_prop_end
-    unlet tag_props
-    unlet tag_uniqe
-    unlet tag_val
-    unlet tags
+    " unlet beforepath
+    " unlet bindent
+    " unlet block_end
+    " unlet chk
+    " unlet full
+    " unlet fullpath
+    " unlet fullpath_rec
+    " unlet fullpathary
+    " unlet i
+    " unlet indent
+    " unlet layer
+    " unlet line
+    " unlet line_end
+    " unlet line_no
+    " unlet mindent
+    " unlet nowpath
+    " unlet page_end
+    " unlet phrase
+    " unlet ret
+    " unlet tag_count
+    " unlet tag_name
+    " unlet tag_nest
+    " unlet tag_nest_ary
+    " unlet tag_nests
+    " unlet tag_prop
+    " unlet tag_prop_end
+    " unlet tag_props
+    " unlet tag_uniqe
+    " unlet tag_val
+    " unlet tags
 
     if exists('cl')
         unlet cl
@@ -255,7 +287,7 @@ function! s:SassSkelton()
     endif
 endfunction
 
-function! s:SassSkeltonMono()
+function! s:CssSkeltonMono()
     let line = getline('.')
     let tag = {'tag':'', 'id':'', 'class':''}
 
@@ -290,7 +322,7 @@ function! s:SassSkeltonMono()
     if ret != ''
         let ret = ret." {\n}\n"
         let @@ = ret
-        echo 'Yanked Sass Skelton Mono.'
+        echo 'Yanked Css Skelton Mono.'
     else
         echo 'No Yanked.'
     endif
@@ -315,5 +347,5 @@ function! s:getSelecterPhrase(obj)
     return tag
 endfunction
 
-command! SassSkeltonMono call s:SassSkeltonMono()
-command! SassSkelton call s:SassSkelton()
+command! CssSkeltonMono call s:CssSkeltonMono()
+command! CssSkelton call s:CssSkelton()
