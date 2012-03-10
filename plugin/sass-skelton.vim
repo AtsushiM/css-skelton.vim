@@ -215,6 +215,44 @@ function! s:SassSkelton()
     else
         echo 'No Yanked.'
     endif
+
+    unlet beforepath
+    unlet bindent
+    unlet block_end
+    unlet chk
+    unlet full
+    unlet fullpath
+    unlet fullpath_rec
+    unlet fullpathary
+    unlet i
+    unlet indent
+    unlet layer
+    unlet line
+    unlet line_end
+    unlet line_no
+    unlet mindent
+    unlet nowpath
+    unlet page_end
+    unlet phrase
+    unlet ret
+    unlet tag_count
+    unlet tag_name
+    unlet tag_nest
+    unlet tag_nest_ary
+    unlet tag_nests
+    unlet tag_prop
+    unlet tag_prop_end
+    unlet tag_props
+    unlet tag_uniqe
+    unlet tag_val
+    unlet tags
+
+    if exists('cl')
+        unlet cl
+    endif
+    if exists('dlayer')
+        unlet dlayer
+    endif
 endfunction
 
 function! s:SassSkeltonMono()
