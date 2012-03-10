@@ -5,7 +5,6 @@
 
 if !exists('g:cssskelton_type')
     let g:cssskelton_type = "css"
-    " let g:cssskelton_type = "sass"
 endif
 if !exists('g:cssskelton_indent')
     let g:cssskelton_indent = "    "

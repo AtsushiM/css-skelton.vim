@@ -1,10 +1,18 @@
-htmlタグ上で
 :CssSkelton
-を実行すれば 開始行のタグを起点にsass形式の
+コマンドを実行した行のタグを起点にCSS形式の
 タグ名、class、idのセレクタのスケルトンをヤンクします。
 ペーストコマンドで好きな場所に貼り付けてください。
 
+:CssSkeltonMono
+コマンドを実行した行の最初のタグのCSSセレクタを
+ヤンクします。
+SASS使用時に便利です。
+
 以下のグローバル変数を書き換えることで動作を変更できます。
+
+" 形式
+" let g:cssskelton_type = "css"
+" let g:cssskelton_type = "sass"
 
 " 出力しないタグ
 let g:cssskelton_ignoretags = ['head', 'title', 'meta', 'link', 'style', 'script', 'noscript', 'object', 'br', 'hr', 'embed', 'area', 'base', 'col', 'keygen', 'param', 'source']
