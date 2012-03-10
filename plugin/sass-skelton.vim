@@ -252,7 +252,7 @@ function! s:SassSkeltonMono()
     if ret != ''
         let ret = ret." {\n}\n"
         let @@ = ret
-        echo 'Yanked CSS Skelton Mono.'
+        echo 'Yanked Sass Skelton Mono.'
     else
         echo 'No Yanked.'
     endif
