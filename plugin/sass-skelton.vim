@@ -1,5 +1,5 @@
 "AUTHOR:   Atsushi Mizoue <asionfb@gmail.com>
-"WEBSITE:  https://github.com/AtsushiM/RetinaResize.vim
+"WEBSITE:  https://github.com/AtsushiM/sass-skelton
 "VERSION:  0.9
 "LICENSE:  MIT
 
@@ -62,54 +62,63 @@ function! s:SassSkelton()
                                     let tag_prop_end = 1
                                 endif
                             endwhile
+                        endif
 
+                        let tag_nest_ary = [tag_nest]
+                        if tag_nest.id != '' && tag_nest.class != ''
+                            let tag_nest_ary = add(tag_nest_ary, deepcopy(tag_nest_ary[0]))
+                            let tag_nest_ary[0].id = ''
+                            let tag_nest_ary[1].class = ''
                         endif
 
                         if count(g:cssskelton_ignoretags, tag_name) == 0
                             let tag_count = tag_count + 1
-                            let tag_nest.layer = tag_count
-
                             if chk != []
                                 let tags[5] = '</'.tag_name.'>'.tags[5]
                             endif
 
-                            let fullpath = fullpath.' '.(tag_nest.layer).'-'.(tag_nest.tag).'.'.(tag_nest.class).'#'.(tag_nest.id)
-                            let tag_nest.path = fullpath
+                            let fullpath_rec = fullpath
+                            for tag_nest_ary_i in tag_nest_ary
+                                let tag_nest = tag_nest_ary_i
+                                let tag_nest.layer = tag_count
 
-                            if count(tag_uniqe, fullpath) == 0
-                                let tag_uniqe = add(tag_uniqe, fullpath)
+                                let fullpath = fullpath_rec.' '.(tag_nest.layer).'-'.(tag_nest.tag).'.'.(tag_nest.class).'#'.(tag_nest.id)
+                                let tag_nest.path = fullpath
 
-                                let fullpathary = split(fullpath, ' ')
-                                let nowpath = fullpathary[-1]
-                                unlet fullpathary[-1]
-                                let beforepath = join(fullpathary, ' ')
-                                if [] == matchlist(beforepath, '\v^/(.*)')
-                                    let beforepath = ' '.beforepath
-                                endif
+                                if count(tag_uniqe, fullpath) == 0
+                                    let tag_uniqe = add(tag_uniqe, fullpath)
 
-                                if count(tag_uniqe, beforepath) == 0
-                                    let tag_nests = add(tag_nests, tag_nest)
-                                else
-                                    " TODO insert()
-                                    let i = 0
-                                    let dlayer = -1 
-                                    while i < len(tag_nests)
-                                        if dlayer == -1
-                                            if tag_nests[i].path == beforepath
-                                                let dlayer = tag_nests[i].layer + 1
-                                            endif
-                                        elseif dlayer > tag_nests[i].layer
-                                            let tag_nests = insert(tag_nests, tag_nest, i)
-                                            break
-                                        endif
-                                        let i = i + 1
-                                    endwhile
+                                    let fullpathary = split(fullpath, ' ')
+                                    let nowpath = fullpathary[-1]
+                                    unlet fullpathary[-1]
+                                    let beforepath = join(fullpathary, ' ')
+                                    if [] == matchlist(beforepath, '\v^/(.*)')
+                                        let beforepath = ' '.beforepath
+                                    endif
 
-                                    if i == len(tag_nests)
+                                    if count(tag_uniqe, beforepath) == 0
                                         let tag_nests = add(tag_nests, tag_nest)
+                                    else
+                                        let i = 0
+                                        let dlayer = -1 
+                                        while i < len(tag_nests)
+                                            if dlayer == -1
+                                                if tag_nests[i].path == beforepath
+                                                    let dlayer = tag_nests[i].layer + 1
+                                                endif
+                                            elseif dlayer > tag_nests[i].layer
+                                                let tag_nests = insert(tag_nests, tag_nest, i)
+                                                break
+                                            endif
+                                            let i = i + 1
+                                        endwhile
+
+                                        if i == len(tag_nests)
+                                            let tag_nests = add(tag_nests, tag_nest)
+                                        endif
                                     endif
                                 endif
-                            endif
+                            endfor
                         endif
                     else
                         let tag_name = matchlist(tag_name, '\v^/(.+)')[1]
@@ -241,7 +250,7 @@ function! s:SassSkeltonMono()
 
     let ret = s:getSelecterPhrase(tag)
     if ret != ''
-        let ret = ret." {\n}"
+        let ret = ret." {\n}\n"
         let @@ = ret
         echo 'Yanked CSS Skelton Mono.'
     else
