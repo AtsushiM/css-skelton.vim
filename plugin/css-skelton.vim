@@ -38,34 +38,7 @@ function! s:CssSkelton()
                     if chk == []
                         let chk = matchlist(tag_name, '\v(.*/$)')
 
-                        let tag_val = matchlist(tag_name, '\v(.{-})\s+(.*)')
-                        let tag_props = ''
-
-                        let tag_nest = {}
-                        let tag_nest.tag = tag_name
-                        let tag_nest.id = ''
-                        let tag_nest.class = ''
-
-                        if tag_val != []
-                            let tag_name = tag_val[1]
-                            let tag_props = tag_val[2]
-                            let tag_prop_end = 0
-
-                            let tag_nest.tag = tag_name
-
-                            while tag_prop_end != 1
-                                let tag_prop = matchlist(tag_props, '\v.{-}(class|id)\="(.{-})"(.*)')
-                                if tag_prop != []
-                                    for e in split(tag_prop[2], '\s')
-                                        let tag_nest[tag_prop[1]] = e
-                                    endfor
-
-                                    let tag_props = tag_prop[3]
-                                else
-                                    let tag_prop_end = 1
-                                endif
-                            endwhile
-                        endif
+                        let tag_nest = s:getTagProp(tag_name)
 
                         let tag_nest_ary = [tag_nest]
                         if tag_nest.id != '' && tag_nest.class != ''
@@ -74,7 +47,7 @@ function! s:CssSkelton()
                             let tag_nest_ary[1].class = ''
                         endif
 
-                        if count(g:cssskelton_ignoretags, tag_name) == 0
+                        if count(g:cssskelton_ignoretags, tag_nest.tag) == 0
                             let tag_count = tag_count + 1
                             if chk != []
                                 let tags[5] = '</'.tag_name.'>'.tags[5]
@@ -128,7 +101,10 @@ function! s:CssSkelton()
                         if count(g:cssskelton_ignoretags, tag_name) == 0
                             let tag_count = tag_count - 1
                             let fullpathary = split(fullpath, ' ')
-                            unlet fullpathary[-1]
+                            if fullpathary != []
+                                unlet fullpathary[-1]
+                            endif
+
                             let fullpath = join(fullpathary, ' ')
                             if [] == matchlist(fullpath, '\v^/(.*)')
                                 let fullpath = ' '.fullpath
@@ -247,37 +223,6 @@ function! s:CssSkelton()
         echo 'No Yanked.'
     endif
 
-    " unlet beforepath
-    " unlet bindent
-    " unlet block_end
-    " unlet chk
-    " unlet full
-    " unlet fullpath
-    " unlet fullpath_rec
-    " unlet fullpathary
-    " unlet i
-    " unlet indent
-    " unlet layer
-    " unlet line
-    " unlet line_end
-    " unlet line_no
-    " unlet mindent
-    " unlet nowpath
-    " unlet page_end
-    " unlet phrase
-    " unlet ret
-    " unlet tag_count
-    " unlet tag_name
-    " unlet tag_nest
-    " unlet tag_nest_ary
-    " unlet tag_nests
-    " unlet tag_prop
-    " unlet tag_prop_end
-    " unlet tag_props
-    " unlet tag_uniqe
-    " unlet tag_val
-    " unlet tags
-
     if exists('cl')
         unlet cl
     endif
@@ -292,29 +237,7 @@ function! s:CssSkeltonMono()
 
     let tags = matchlist(line, '\v(.{-})(\<)(.{-})(\>)(.*)')
     if tags != []
-        let tag_name = tags[3]
-        let tag_val = matchlist(tag_name, '\v(.{-})\s+(.*)')
-
-        if tag_val != []
-            let tag_name = tag_val[1]
-            let tag_props = tag_val[2]
-            let tag_prop_end = 0
-
-            while tag_prop_end != 1
-                let tag_prop = matchlist(tag_props, '\v.{-}(class|id)\="(.{-})"(.*)')
-                if tag_prop != []
-                    for e in split(tag_prop[2], '\s')
-                        let tag[tag_prop[1]] = e
-                    endfor
-
-                    let tag_props = tag_prop[3]
-                else
-                    let tag_prop_end = 1
-                endif
-            endwhile
-        endif
-
-        let tag.tag = tag_name
+        let tag = s:getTagProp(tags[3])
     endif
 
     let ret = s:getSelecterPhrase(tag)
@@ -326,6 +249,37 @@ function! s:CssSkeltonMono()
         echo 'No Yanked.'
     endif
     let @@ = ret
+endfunction
+
+function! s:getTagProp(tag_val)
+    let tag_val = matchlist(a:tag_val, '\v(.{-})\s+(.*)')
+
+    let tag_nest = {}
+    let tag_nest.tag = a:tag_val
+    let tag_nest.id = ''
+    let tag_nest.class = ''
+
+    if tag_val != []
+        let tag_name = tag_val[1]
+        let tag_props = tag_val[2]
+        let tag_prop_end = 0
+
+        let tag_nest.tag = tag_name
+
+        while tag_prop_end != 1
+            let tag_prop = matchlist(tag_props, '\v.{-}(class|id)\="(.{-})"(.*)')
+            if tag_prop != []
+                for e in split(tag_prop[2], '\s')
+                    let tag_nest[tag_prop[1]] = e
+                endfor
+
+                let tag_props = tag_prop[3]
+            else
+                let tag_prop_end = 1
+            endif
+        endwhile
+    endif
+    return tag_nest
 endfunction
 
 function! s:getSelecterPhrase(obj)
