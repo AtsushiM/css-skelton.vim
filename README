@@ -16,6 +16,10 @@ SASS使用時に便利です。
 
 " 出力しないタグ
 let g:cssskelton_ignoretags = ['head', 'title', 'meta', 'link', 'style', 'script', 'noscript', 'object', 'br', 'hr', 'embed', 'area', 'base', 'col', 'keygen', 'param', 'source']
+" 出力しないクラス
+let g:cssskelton_ignoreclass = ['clearfix']
+" 出力しないid
+let g:cssskelton_ignoreid = []
 
 " インデント
 let g:cssskelton_indent = "    "
