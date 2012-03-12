@@ -12,6 +12,12 @@ endif
 if !exists('g:cssskelton_ignoretags')
     let g:cssskelton_ignoretags = ['head', 'title', 'meta', 'link', 'style', 'script', 'noscript', 'object', 'br', 'hr', 'embed', 'area', 'base', 'col', 'keygen', 'param', 'source']
 endif
+if !exists('g:cssskelton_ignoreclass')
+    let g:cssskelton_ignoreclass = ['clearfix']
+endif
+if !exists('g:cssskelton_ignoreid')
+    let g:cssskelton_ignoreid = []
+endif
 
 function! s:CssSkelton()
     let block_end = 0
@@ -270,7 +276,15 @@ function! s:getTagProp(tag_val)
             let tag_prop = matchlist(tag_props, '\v.{-}(class|id)\="(.{-})"(.*)')
             if tag_prop != []
                 for e in split(tag_prop[2], '\s')
-                    let tag_nest[tag_prop[1]] = e
+                    if tag_prop[1] == 'class'
+                        let chk = g:cssskelton_ignoreclass
+                    else
+                        let chk = g:cssskelton_ignoreid
+                    endif
+
+                    if count(chk, e) == 0
+                        let tag_nest[tag_prop[1]] = e
+                    endif
                 endfor
 
                 let tag_props = tag_prop[3]
