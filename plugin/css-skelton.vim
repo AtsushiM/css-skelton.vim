@@ -19,6 +19,8 @@ if !exists('g:cssskelton_ignoreid')
     let g:cssskelton_ignoreid = []
 endif
 
+let s:cssskelton_tags = []
+
 function! s:CssSkelton()
     let block_end = 0
     let tag_count = 0
@@ -229,12 +231,40 @@ function! s:CssSkelton()
         echo 'No Yanked.'
     endif
 
-    if exists('cl')
-        unlet cl
-    endif
-    if exists('dlayer')
-        unlet dlayer
-    endif
+    let s:cssskelton_tags = tag_nests
+endfunction
+
+function! s:CssOutput()
+    let layer = 0
+    for obj in s:cssskelton_tags
+        if obj.layer <= layer
+            let l = layer - obj.layer
+            if l == 0
+                silent normal o
+                call setline('.', '}')
+            else
+                while l + 1 > 0
+                    silent normal o
+                    call setline('.', '}')
+                    let l = l - 1
+                endwhile
+            endif
+        endif
+
+        let phrase = s:getSelecterPhrase(obj)
+        if phrase != ''
+            silent normal o
+            call setline('.', phrase.' {')
+        endif
+        let layer = obj.layer
+    endfor
+
+    let i = layer
+    while i > 0
+        silent normal o
+        call setline('.', '}')
+        let i = i - 1
+    endwhile
 endfunction
 
 function! s:CssSkeltonMono()
@@ -316,3 +346,4 @@ endfunction
 
 command! CssSkeltonMono call s:CssSkeltonMono()
 command! CssSkelton call s:CssSkelton()
+command! CssOutput call s:CssOutput()
