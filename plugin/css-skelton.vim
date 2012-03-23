@@ -21,4 +21,3 @@ endif
 
 command! CssSkeltonMono call cssskelton#CssSkeltonMono()
 command! CssSkelton call cssskelton#CssSkelton()
-command! CssOutput call cssskelton#CssOutput()
