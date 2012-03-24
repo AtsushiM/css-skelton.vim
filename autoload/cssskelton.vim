@@ -5,7 +5,7 @@
 
 let s:cssskelton_tags = []
 
-function! cssskelton#CssSkelton()
+function! cssskelton#CssSkelton(...)
     let block_end = 0
     let tag_count = 0
     let tag_nests = []
@@ -13,6 +13,16 @@ function! cssskelton#CssSkelton()
     let fullpath = ''
     let line_no = line('.')
     let page_end = line('w$')
+
+    let type = g:cssskelton_type
+
+    if a:0 != 0
+        let type = a:000[0]
+    endif
+
+    if type != 'sass'
+        let line_no = 1
+    endif
 
     while block_end != 1
         let line = getline(line_no)
@@ -125,87 +135,10 @@ function! cssskelton#CssSkelton()
         endwhile
     endwhile
 
-    let ret = ''
-
-    if g:cssskelton_type == 'sass'
-        let full = ''
-        let indent = g:cssskelton_indent
-        let mindent = ''
-        let bindent = mindent
-        let layer = 0
-        for obj in tag_nests
-            let i = 1
-            let bindent = mindent
-            if obj.layer <= layer
-                let l = layer - obj.layer
-                if l == 0
-                    let full = full.bindent."}\n"
-                else
-                    while l + 1 > 0
-                        let layer = layer - 1
-                        let cl = layer
-                        let mindent = ''
-                        while cl > 0
-                            let mindent = mindent.indent
-                            let cl = cl - 1
-                        endwhile
-                        let full = full.mindent."}\n"
-                        let l = l - 1
-                    endwhile
-                endif
-            endif
-            let mindent = ''
-            while i < obj.layer
-                let mindent = mindent.indent
-                let i = i + 1
-            endwhile
-
-            let phrase = cssskelton#getSelecterPhrase(obj)
-            if phrase != ''
-                let full = full.mindent.phrase." {\n"
-            endif
-            let layer = obj.layer
-        endfor
-
-        let i = layer
-        while i > 0
-            let j = 1
-            let mindent = ''
-            while j < i
-                let mindent = mindent.indent
-                let j = j + 1
-            endwhile
-            let full = full.mindent."}\n"
-            let i = i - 1
-        endwhile
-        let ret = full
+    if type == 'sass'
+        let ret = cssskelton#makeSelecterSASS(tag_nests)
     else
-        for obj in tag_nests
-            let end = 0
-            let path = ''
-            let base = obj.path
-            while end == 0
-                let paths = matchlist(base, '\v^( [0-9]+\-)([^ ]+)(.*)')
-                
-                if paths != []
-                    let phrases = matchlist(paths[2], '\v(.{-})\.(.{-})#(.*)')
-
-                    if phrases[3] != ''
-                        let path = path.'#'.phrases[3]
-                    elseif phrases[2] != ''
-                        let path = path.'.'.phrases[2]
-                    else
-                        let path = path.phrases[1]
-                    endif
-
-                    let path = path.' '
-                    let base = paths[3]
-                else
-                    let end = 1
-                endif
-            endwhile
-            let ret = ret.path."{\n}\n"
-        endfor
+        let ret = cssskelton#makeSelecterCSS(tag_nests)
     endif
 
     if ret != ''
@@ -293,4 +226,91 @@ function! cssskelton#getSelecterPhrase(obj)
     endif
 
     return tag
+endfunction
+
+function! cssskelton#makeSelecterSASS(tags)
+    let full = ''
+    let indent = g:cssskelton_indent
+    let mindent = ''
+    let bindent = mindent
+    let layer = 0
+    for obj in a:tags
+        let i = 1
+        let bindent = mindent
+        if obj.layer <= layer
+            let l = layer - obj.layer
+            if l == 0
+                let full = full.bindent."}\n"
+            else
+                while l + 1 > 0
+                    let layer = layer - 1
+                    let cl = layer
+                    let mindent = ''
+                    while cl > 0
+                        let mindent = mindent.indent
+                        let cl = cl - 1
+                    endwhile
+                    let full = full.mindent."}\n"
+                    let l = l - 1
+                endwhile
+            endif
+        endif
+        let mindent = ''
+        while i < obj.layer
+            let mindent = mindent.indent
+            let i = i + 1
+        endwhile
+
+        let phrase = cssskelton#getSelecterPhrase(obj)
+        if phrase != ''
+            let full = full.mindent.phrase." {\n"
+        endif
+        let layer = obj.layer
+    endfor
+
+    let i = layer
+    while i > 0
+        let j = 1
+        let mindent = ''
+        while j < i
+            let mindent = mindent.indent
+            let j = j + 1
+        endwhile
+        let full = full.mindent."}\n"
+        let i = i - 1
+    endwhile
+
+    return full
+endfunction
+
+function! cssskelton#makeSelecterCSS(tags)
+    let ret = ''
+    for obj in a:tags
+        let end = 0
+        let path = ''
+        let base = obj.path
+        while end == 0
+            let paths = matchlist(base, '\v^( [0-9]+\-)([^ ]+)(.*)')
+            
+            if paths != []
+                let phrases = matchlist(paths[2], '\v(.{-})\.(.{-})#(.*)')
+
+                if phrases[3] != ''
+                    let path = path.'#'.phrases[3]
+                elseif phrases[2] != ''
+                    let path = path.'.'.phrases[2]
+                else
+                    let path = path.phrases[1]
+                endif
+
+                let path = path.' '
+                let base = paths[3]
+            else
+                let end = 1
+            endif
+        endwhile
+        let ret = ret.path."{\n}\n"
+    endfor
+
+    return ret
 endfunction

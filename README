@@ -1,4 +1,7 @@
 :CssSkelton
+g:cssskelton_typeが'css'の場合、
+ページ全体のセレクタを生成します。
+g:cssskelton_typeが'sass'の場合、
 コマンドを実行した行のタグを起点にCSS形式の
 タグ名、class、idのセレクタのスケルトンをヤンクします。
 ペーストコマンドで好きな場所に貼り付けてください。

@@ -10,7 +10,7 @@ if !exists('g:cssskelton_indent')
     let g:cssskelton_indent = "    "
 endif
 if !exists('g:cssskelton_ignoretags')
-    let g:cssskelton_ignoretags = ['head', 'title', 'meta', 'link', 'style', 'script', 'noscript', 'object', 'br', 'hr', 'embed', 'area', 'base', 'col', 'keygen', 'param', 'source']
+    let g:cssskelton_ignoretags = ['html', 'head', 'title', 'meta', 'link', 'style', 'script', 'noscript', 'object', 'br', 'hr', 'embed', 'area', 'base', 'col', 'keygen', 'param', 'source']
 endif
 if !exists('g:cssskelton_ignoreclass')
     let g:cssskelton_ignoreclass = ['clearfix']
@@ -19,5 +19,5 @@ if !exists('g:cssskelton_ignoreid')
     let g:cssskelton_ignoreid = []
 endif
 
-command! CssSkeltonMono call cssskelton#CssSkeltonMono()
-command! CssSkelton call cssskelton#CssSkelton()
+command! -nargs=? CssSkeltonMono call cssskelton#CssSkeltonMono(<f-args>)
+command! -nargs=? CssSkelton call cssskelton#CssSkelton(<f-args>)
