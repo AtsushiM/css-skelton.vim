@@ -3,8 +3,6 @@
 "VERSION:  0.9
 "LICENSE:  MIT
 
-let s:cssskelton_tags = []
-
 function! cssskelton#CssSkelton(...)
     let block_end = 0
     let tag_count = 0
@@ -147,8 +145,6 @@ function! cssskelton#CssSkelton(...)
     else
         echo 'No Yanked.'
     endif
-
-    let s:cssskelton_tags = tag_nests
 endfunction
 
 function! cssskelton#CssSkeltonMono()
