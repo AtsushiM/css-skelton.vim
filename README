@@ -3,19 +3,26 @@ g:cssskelton_typeが'css'の場合、
 ページ全体のセレクタを生成します。
 g:cssskelton_typeが'sass'の場合、
 コマンドを実行した行のタグを起点にCSS形式の
-タグ名、class、idのセレクタのスケルトンをヤンクします。
-ペーストコマンドで好きな場所に貼り付けてください。
+タグ名、class、idのセレクタのスケルトンを生成します。
 
 :CssSkeltonMono
 コマンドを実行した行の最初のタグのCSSセレクタを
-ヤンクします。
+生成します。
 SASS使用時に便利です。
+
+:CssPaste
+生成されたセレクタをペーストします。
+※デフォルトではCssPasteコマンドで貼り付けを行います。
+
 
 以下のグローバル変数を書き換えることで動作を変更できます。
 
 " 形式
 " let g:cssskelton_type = "css"
 " let g:cssskelton_type = "sass"
+
+" 生成されたセレクタをヤンク(pでペーストできる状態にする) 1:有効 0:無効
+let g:cssskelton_autoyank = 0
 
 " 出力しないタグ
 let g:cssskelton_ignoretags = ['head', 'title', 'meta', 'link', 'style', 'script', 'noscript', 'object', 'br', 'hr', 'embed', 'area', 'base', 'col', 'keygen', 'param', 'source']

@@ -140,10 +140,15 @@ function! cssskelton#CssSkelton(...)
     endif
 
     if ret != ''
-        let @@ = ret
-        echo 'Yanked CSS Skelton.'
+        let g:cssskelton_register = ret
+
+        if g:cssskelton_autoyank == 1
+            let @@ = ret
+        endif
+
+        echo 'Registration CSS Skelton.'
     else
-        echo 'No Yanked.'
+        echo 'No Registe.'
     endif
 endfunction
 
@@ -159,12 +164,17 @@ function! cssskelton#CssSkeltonMono()
     let ret = cssskelton#getSelecterPhrase(tag)
     if ret != ''
         let ret = ret." {\n}\n"
-        let @@ = ret
-        echo 'Yanked Css Skelton Mono.'
+
+        let g:cssskelton_register = ret
+
+        if g:cssskelton_autoyank == 1
+            let @@ = ret
+        endif
+
+        echo 'Registration Css Skelton Mono.'
     else
-        echo 'No Yanked.'
+        echo 'No Registe.'
     endif
-    let @@ = ret
 endfunction
 
 function! cssskelton#getTagProp(tag_val)
@@ -309,4 +319,8 @@ function! cssskelton#makeSelecterCSS(tags)
     endfor
 
     return ret
+endfunction
+
+function! cssskelton#CssPaste()
+    call append('.', split(g:cssskelton_register, "\n"))
 endfunction
