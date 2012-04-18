@@ -3,6 +3,9 @@
 "VERSION:  0.9
 "LICENSE:  MIT
 
+let s:save_cpo = &cpo
+set cpo&vim
+
 if !exists('g:cssskelton_type')
     let g:cssskelton_type = "css"
 endif
@@ -346,3 +349,5 @@ endfunction
 function! cssskelton#CssPaste()
     call append('.', split(g:cssskelton_register, "\n"))
 endfunction
+
+let &cpo = s:save_cpo
